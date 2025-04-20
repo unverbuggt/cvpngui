@@ -125,7 +125,7 @@ begin
     TincConfig.KeyFile := Ini.ReadString('Tinc', 'KeyFile', '');
     TincConfig.Port := Ini.ReadString('Tinc', 'Port', '655');
     TincConfig.UPnP := Ini.ReadBool('Tinc', 'UPnP', True);
-    TincConfig.Autostart := Ini.ReadBool('Tinc', 'Autostart', True);
+    TincConfig.Autostart := Ini.ReadBool('Tinc', 'Autostart', False);
 
     cbTincKey.Text := TincConfig.Name;
     ckUpnp.Checked := TincConfig.UPnP;
@@ -301,6 +301,8 @@ begin
     meTincLog.Lines.Add('Tinc nicht gefunden');
   {$ENDIF Unix}
   {$IFDEF Windows}
+  if not FileExists('tinc\tincd.exe') then
+    meTincLog.Lines.Add('Tinc nicht gefunden');
   meTapAdapterSep.Visible:=True;
   meOpenNC := TMenuItem.Create(pmTapAdapter);
   meOpenNC.Caption := 'Öffne Netzwerkverbindung';
