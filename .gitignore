@@ -1,0 +1,9 @@
+tinc/*
+tap-win64/*
+lib/*
+coronavpn/*
+backup/*
+cvpngui.exe
+cvpngui.dbg
+cvpngui.ini
+cvpngui.res
