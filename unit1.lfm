@@ -701,15 +701,6 @@ object Form1: TForm1
     TabOrder = 11
     OnChange = ckAutostartTincChange
   end
-  object Button1: TButton
-    Left = 416
-    Height = 40
-    Top = 96
-    Width = 96
-    Caption = 'Button1'
-    TabOrder = 12
-    OnClick = Button1Click
-  end
   object lvNodes: TListView
     Left = 936
     Height = 464
@@ -717,15 +708,20 @@ object Form1: TForm1
     Width = 288
     Columns = <    
       item
-        Caption = 'Name'
+        Caption = 'Node'
         Width = 100
       end    
       item
-        Caption = 'Über'
+        Caption = 'Via'
         Width = 100
       end    
       item
-        Caption = 'Kompr.'
+        Caption = 'C'
+        Width = 30
+      end    
+      item
+        Caption = 'RTT'
+        Width = 56
       end    
       item
         Caption = 'tst'
@@ -736,7 +732,7 @@ object Form1: TForm1
     ReadOnly = True
     RowSelect = True
     ScrollBars = ssAutoBoth
-    TabOrder = 13
+    TabOrder = 12
     ViewStyle = vsReport
   end
   object pmTapAdapter: TPopupMenu

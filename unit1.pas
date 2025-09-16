@@ -41,7 +41,6 @@ type
     btStartTinc: TButton;
     btSave: TButton;
     btStopTinc: TButton;
-    Button1: TButton;
     cbTapAdapter: TComboBox;
     cbTincKey: TComboBox;
     cgCheck: TCheckGroup;
@@ -68,7 +67,6 @@ type
     procedure btSaveClick(Sender: TObject);
     procedure btStartTincClick(Sender: TObject);
     procedure btStopTincClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
     procedure cbTapAdapterChange(Sender: TObject);
     procedure cbTincKeyChange(Sender: TObject);
     procedure ckAutostartTincChange(Sender: TObject);
@@ -234,6 +232,8 @@ begin
 end;
 
 procedure TForm1.StartTincd();
+var
+  pid: array of String;
 begin
   if not Assigned(AProcess) then begin
     meTincLog.Lines.Add('starte Tinc...');
@@ -292,6 +292,18 @@ begin
     AProcess.Execute;
     Sleep(500);
     ProcessOutput(nil);
+    {$IFDEF Windows}
+    pid := SplitString(ReadTestFile(GeneralConfig.Name + '\pid'), ' ');
+    {$ENDIF Windows}
+    {$IFDEF Unix}
+    pid := SplitString(ReadTestFile(GeneralConfig.Name + '/pid'), ' ');
+    {$ENDIF Unix}
+    if (Length(pid) = 5) and AProcess.Running then begin
+      CTinc.Host := 'localhost';//pid[2];
+      CTinc.Port := StrToInt(pid[4]);
+      TincCmd := '0 ^' + pid[1] + ' 0' + #10;
+      CTinc.Connect();
+    end;
   end;
 end;
 
@@ -405,6 +417,7 @@ begin
             if lvNodes.Items[k].Caption = par[Ord(DN_NAME)] then begin
               lvNodes.Items[k].SubItems[0] := par[Ord(DN_NEXTHOP)];
               lvNodes.Items[k].SubItems[1] := par[Ord(DN_COMPRESSION)];
+              lvNodes.Items[k].SubItems[2] := par[Ord(DN_RTT)];
               lvNodes.Items[k].SubItems[lvNodes.Items[k].SubItems.Count-1] := '';
               item_found := True;
               Break;
@@ -415,6 +428,7 @@ begin
             itm.Caption := par[Ord(DN_NAME)];
             itm.SubItems.Add(par[Ord(DN_NEXTHOP)]);
             itm.SubItems.Add(par[Ord(DN_COMPRESSION)]);
+            itm.SubItems.Add(par[Ord(DN_RTT)]);
             itm.SubItems.Add('');
           end;
         end else begin //end
@@ -464,25 +478,6 @@ end;
 procedure TForm1.btStopTincClick(Sender: TObject);
 begin
   StopTincd();
-end;
-
-procedure TForm1.Button1Click(Sender: TObject);
-var
-  pid: array of String;
-begin
-{$IFDEF Windows}
-  pid := SplitString(ReadTestFile(GeneralConfig.Name + '\pid'), ' ');
-{$ENDIF Windows}
-{$IFDEF Unix}
-  pid := SplitString(ReadTestFile(GeneralConfig.Name + '/pid'), ' ');
-{$ENDIF Unix}
-  if (Length(pid) <> 5) then begin
-    Exit;
-  end;
-  CTinc.Host := 'localhost';//pid[2];
-  CTinc.Port := StrToInt(pid[4]);
-  TincCmd := '0 ^' + pid[1] + ' 0' + #10;
-  CTinc.Connect();
 end;
 
 procedure TForm1.ProcessOutput(Sender: TObject);
