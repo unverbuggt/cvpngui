@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MyProject. If not, see <https://www.gnu.org/licenses/>.
+ * along with CVPNGUI. If not, see <https://www.gnu.org/licenses/>.
 }
 
 unit Unit1;
@@ -22,14 +22,14 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  Process, AsyncProcess, ExtCtrls, Menus, StrUtils, IniFiles, FileUtil,
-  cvpnmod,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Process,
+  AsyncProcess, ExtCtrls, Menus, ComCtrls, StrUtils, IniFiles, FileUtil,
+  cvpnmod, tincctl, lNetComponents,
   {$IFDEF Windows}
   cvpnwin;
   {$ENDIF Windows}
   {$IFDEF Unix}
-  cvpnlin;
+  cvpnlin, lNet;
   {$ENDIF Unix}
 
 
@@ -41,6 +41,7 @@ type
     btStartTinc: TButton;
     btSave: TButton;
     btStopTinc: TButton;
+    Button1: TButton;
     cbTapAdapter: TComboBox;
     cbTincKey: TComboBox;
     cgCheck: TCheckGroup;
@@ -52,6 +53,8 @@ type
     lbTincKey: TLabel;
     lbIpAddress: TLabel;
     lbTapAdapter: TLabel;
+    CTinc: TLTCPComponent;
+    lvNodes: TListView;
     meAddTap: TMenuItem;
     meDelAllTap: TMenuItem;
     meSetManIp: TMenuItem;
@@ -60,14 +63,19 @@ type
     pmIpAddress: TPopupMenu;
     meTapAdapterSep: TMenuItem;
     meIpAddressSep: TMenuItem;
+    TTinc: TTimer;
     procedure btCheckClick(Sender: TObject);
     procedure btSaveClick(Sender: TObject);
     procedure btStartTincClick(Sender: TObject);
     procedure btStopTincClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
     procedure cbTapAdapterChange(Sender: TObject);
     procedure cbTincKeyChange(Sender: TObject);
     procedure ckAutostartTincChange(Sender: TObject);
     procedure ckUpnpChange(Sender: TObject);
+    procedure CTincConnect(aSocket: TLSocket);
+    procedure CTincDisconnect(aSocket: TLSocket);
+    procedure CTincReceive(aSocket: TLSocket);
     procedure edIpAddressChange(Sender: TObject);
     procedure edTincPortChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -84,6 +92,7 @@ type
     procedure Panel1Click(Sender: TObject);
     procedure ProcessOutput(Sender: TObject);
     procedure ReadConfig();
+    procedure TTincTimer(Sender: TObject);
     procedure WriteConfig();
     procedure CheckConfiguration();
     procedure StartTincd();
@@ -96,6 +105,7 @@ type
     TapConfig: TapConfigurationType;
     TincConfig: TincConfigurationType;
     TapIps: array of String;
+    TincCmd: String;
   public
 
   end;
@@ -135,7 +145,7 @@ begin
     edIpAddress.Text := TapConfig.IpAddress;
     cbTapAdapter.Text := TapConfig.FriendlyName;
 
-    //Tinc
+    //CTinc
     cbTincKey.Items.Clear;
     {$IFDEF Windows}
     FileList := FindAllFiles(GeneralConfig.Name + '\keys\', '*.key', false);
@@ -148,6 +158,15 @@ begin
 
   finally
     Ini.Free;
+  end;
+end;
+
+procedure TForm1.TTincTimer(Sender: TObject);
+begin
+  if CTinc.Connected then begin
+    CTinc.SendMessage(TincCmd);
+  end else begin
+    TTinc.Enabled := False;
   end;
 end;
 
@@ -351,6 +370,72 @@ begin
   TincConfig.UPnP := ckUpnp.Checked;
 end;
 
+procedure TForm1.CTincConnect(aSocket: TLSocket);
+begin
+  TTinc.Enabled := True;
+end;
+
+procedure TForm1.CTincDisconnect(aSocket: TLSocket);
+begin
+  TTinc.Enabled := False;
+end;
+
+procedure TForm1.CTincReceive(aSocket: TLSocket);
+var
+ msg:String;
+ lines:Array of String;
+ par:Array of String;
+ i, k : Integer;
+ item_found : Boolean;
+ itm : TListItem;
+begin
+  TTinc.Enabled := False;
+  CTinc.GetMessage(msg);
+  lines := SplitString(msg, #10);
+  for i := 0 to High(lines) do begin
+    par := SplitString(lines[i], ' ');
+    if Length(par) >= 2 then begin
+      if (StrToInt(par[Ord(DN_C1)]) = Ord(ACK)) and (StrToInt(par[Ord(DN_C2)]) = Ord(REQ_STOP)) then begin
+        TincCmd := IntToStr(Ord(CONTROL)) + ' ' + IntToStr(Ord(REQ_DUMP_NODES)) + #10;
+        if CTinc.Connected then TTinc.Enabled := True;
+      end else if (StrToInt(par[Ord(DN_C1)]) = Ord(CONTROL)) and (StrToInt(par[Ord(DN_C2)]) = Ord(REQ_DUMP_NODES)) then begin
+        if Length(par) = Ord(DN_CNT) then begin //entry
+          item_found := False;
+          for k := 0 to lvNodes.Items.Count-1 do begin
+            if lvNodes.Items[k].Caption = par[Ord(DN_NAME)] then begin
+              lvNodes.Items[k].SubItems[0] := par[Ord(DN_NEXTHOP)];
+              lvNodes.Items[k].SubItems[1] := par[Ord(DN_COMPRESSION)];
+              lvNodes.Items[k].SubItems[lvNodes.Items[k].SubItems.Count-1] := '';
+              item_found := True;
+              Break;
+            end;
+          end;
+          if not item_found and (par[Ord(DN_NEXTHOP)] <> '-') and (par[Ord(DN_NAME)] <> TincConfig.Name) then begin
+            itm := lvNodes.Items.Add;
+            itm.Caption := par[Ord(DN_NAME)];
+            itm.SubItems.Add(par[Ord(DN_NEXTHOP)]);
+            itm.SubItems.Add(par[Ord(DN_COMPRESSION)]);
+            itm.SubItems.Add('');
+          end;
+        end else begin //end
+          for k := 0 to lvNodes.Items.Count-1 do begin //delete marked items
+            if lvNodes.Items[k].SubItems[lvNodes.Items[k].SubItems.Count-1] <> '' then begin
+              lvNodes.Items[k].SubItems.Clear;
+              lvNodes.Items[k].Delete;
+            end;
+          end;
+          for k := 0 to lvNodes.Items.Count-1 do begin //mark all items
+            lvNodes.Items[k].SubItems[lvNodes.Items[k].SubItems.Count-1] := 'del';
+          end;
+        end;
+      end;
+    end;
+  end;
+  TTinc.Enabled := True;
+
+
+end;
+
 procedure TForm1.edIpAddressChange(Sender: TObject);
 begin
   TapConfig.IpAddress := edIpAddress.Text;
@@ -379,6 +464,25 @@ end;
 procedure TForm1.btStopTincClick(Sender: TObject);
 begin
   StopTincd();
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+var
+  pid: array of String;
+begin
+{$IFDEF Windows}
+  pid := SplitString(ReadTestFile(GeneralConfig.Name + '\pid'), ' ');
+{$ENDIF Windows}
+{$IFDEF Unix}
+  pid := SplitString(ReadTestFile(GeneralConfig.Name + '/pid'), ' ');
+{$ENDIF Unix}
+  if (Length(pid) <> 5) then begin
+    Exit;
+  end;
+  CTinc.Host := pid[2];
+  CTinc.Port := StrToInt(pid[4]);
+  TincCmd := '0 ^' + pid[1] + ' 0' + #10;
+  CTinc.Connect();
 end;
 
 procedure TForm1.ProcessOutput(Sender: TObject);
