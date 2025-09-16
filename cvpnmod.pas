@@ -157,7 +157,7 @@ begin
     end;
 
     for i := 0 to 3 do
-      octets[i] := {(}mask shr (8 * (3 - i)){) and $FF};
+      octets[i] := (mask shr (8 * (3 - i))) and $FF;
 
     Result := Format('%d.%d.%d.%d', [octets[0], octets[1], octets[2], octets[3]]);
   except

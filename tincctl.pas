@@ -46,32 +46,7 @@ type
     DN_OPTIONS, DN_STATUS, DN_NEXTHOP, DN_VIA, DN_DISTANCE,
     DN_MTU, DN_MINMTU, DN_MAXMTU, DN_LASTTS, DN_RTT,
     DN_INPACKETS, DN_INBYTES, DN_OUTPACKETS, DN_OUTBYTES, DN_CNT);
-  procedure ConnectTinc(GeneralConfig: GeneralConfigurationType);
 
 implementation
-
-procedure ConnectTinc(GeneralConfig: GeneralConfigurationType);
-var
-  pid: array of String;
-  Host: String;
-  Port: Integer;
-  Key: String;
-  Cmd: String;
-begin
-  {$IFDEF Windows}
-  pid := SplitString(ReadTestFile(GeneralConfig.Name + '\pid'), ' ');
-  {$ENDIF Windows}
-  {$IFDEF Unix}
-  pid := SplitString(ReadTestFile(GeneralConfig.Name + '/pid'), ' ');
-  {$ENDIF Unix}
-  if (Length(pid) <> 5) then begin
-    Exit;
-  end;
-  Host := pid[2];
-  Port := StrToInt(pid[4]);
-  Key := pid[1];
-
-  Cmd := '0 ^' + Key + ' 0' + #10;
-end;
 
 end.

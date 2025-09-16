@@ -24,12 +24,12 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Process,
   AsyncProcess, ExtCtrls, Menus, ComCtrls, StrUtils, IniFiles, FileUtil,
-  cvpnmod, tincctl, lNetComponents,
+  cvpnmod, tincctl, lNetComponents, lNet,
   {$IFDEF Windows}
   cvpnwin;
   {$ENDIF Windows}
   {$IFDEF Unix}
-  cvpnlin, lNet;
+  cvpnlin;
   {$ENDIF Unix}
 
 
@@ -479,7 +479,7 @@ begin
   if (Length(pid) <> 5) then begin
     Exit;
   end;
-  CTinc.Host := pid[2];
+  CTinc.Host := 'localhost';//pid[2];
   CTinc.Port := StrToInt(pid[4]);
   TincCmd := '0 ^' + pid[1] + ' 0' + #10;
   CTinc.Connect();
