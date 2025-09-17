@@ -400,6 +400,7 @@ var
  i, k : Integer;
  item_found : Boolean;
  itm : TListItem;
+ rtt : String;
 begin
   TTinc.Enabled := False;
   CTinc.GetMessage(msg);
@@ -413,11 +414,18 @@ begin
       end else if (StrToInt(par[Ord(DN_C1)]) = Ord(CONTROL)) and (StrToInt(par[Ord(DN_C2)]) = Ord(REQ_DUMP_NODES)) then begin
         if Length(par) = Ord(DN_CNT) then begin //entry
           item_found := False;
+          rtt := par[Ord(DN_RTT)];
+          if rtt = '-1' then begin
+            rtt := '-';
+          end else begin
+            rtt := IntToStr(Round(StrToInt(par[Ord(DN_RTT)]) / 1000)) + ' ms';
+          end;
+
           for k := 0 to lvNodes.Items.Count-1 do begin
             if lvNodes.Items[k].Caption = par[Ord(DN_NAME)] then begin
               lvNodes.Items[k].SubItems[0] := par[Ord(DN_NEXTHOP)];
               lvNodes.Items[k].SubItems[1] := par[Ord(DN_COMPRESSION)];
-              lvNodes.Items[k].SubItems[2] := par[Ord(DN_RTT)];
+              lvNodes.Items[k].SubItems[2] := rtt;
               lvNodes.Items[k].SubItems[lvNodes.Items[k].SubItems.Count-1] := '';
               item_found := True;
               Break;
@@ -428,7 +436,7 @@ begin
             itm.Caption := par[Ord(DN_NAME)];
             itm.SubItems.Add(par[Ord(DN_NEXTHOP)]);
             itm.SubItems.Add(par[Ord(DN_COMPRESSION)]);
-            itm.SubItems.Add(par[Ord(DN_RTT)]);
+            itm.SubItems.Add(rtt);
             itm.SubItems.Add('');
           end;
         end else begin //end
