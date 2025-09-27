@@ -413,7 +413,6 @@ begin
         TincCmd := IntToStr(Ord(CONTROL)) + ' ' + IntToStr(Ord(REQ_DUMP_NODES)) + #10;
         if CTinc.Connected then TTinc.Enabled := True;
       end else if (StrToInt(par[Ord(DN_C1)]) = Ord(CONTROL)) and (StrToInt(par[Ord(DN_C2)]) = Ord(REQ_DUMP_NODES)) then begin
-        ProgressBar1.Position := (ProgressBar1.Position + 1) Mod 100;
         if Length(par) = Ord(DN_CNT) then begin //entry
           item_found := False;
           rtt := par[Ord(DN_RTT)];
@@ -425,6 +424,7 @@ begin
 
           for k := 0 to lvNodes.Items.Count-1 do begin
             if lvNodes.Items[k].Caption = par[Ord(DN_NAME)] then begin
+              ProgressBar1.Position := (ProgressBar1.Position + 1) Mod 100;
               lvNodes.Items[k].SubItems[0] := par[Ord(DN_NEXTHOP)];
               lvNodes.Items[k].SubItems[1] := par[Ord(DN_COMPRESSION)];
               lvNodes.Items[k].SubItems[2] := rtt;
@@ -434,6 +434,7 @@ begin
             end;
           end;
           if not item_found and (par[Ord(DN_NEXTHOP)] <> '-') and (par[Ord(DN_NAME)] <> TincConfig.Name) then begin
+            ProgressBar1.Position := (ProgressBar1.Position + 1) Mod 100;
             itm := lvNodes.Items.Add;
             itm.Caption := par[Ord(DN_NAME)];
             itm.SubItems.Add(par[Ord(DN_NEXTHOP)]);
