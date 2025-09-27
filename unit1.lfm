@@ -2,12 +2,12 @@ object Form1: TForm1
   Left = 110
   Height = 480
   Top = 342
-  Width = 1229
+  Width = 1240
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'CoronaVPN GUI'
   ClientHeight = 480
-  ClientWidth = 1229
+  ClientWidth = 1240
   Icon.Data = {
     EE3A00000000010003003030000001002000A825000036000000202000000100
     2000A8100000DE25000010100000010020006804000086360000280000003000
@@ -483,7 +483,6 @@ object Form1: TForm1
     FFFF8003FFFFC003FFFFC803FFFFF88FFFFF
   }
   Position = poDesktopCenter
-  LCLVersion = '4.2.0.0'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
@@ -497,11 +496,11 @@ object Form1: TForm1
   end
   object cbTapAdapter: TComboBox
     Left = 408
-    Height = 34
+    Height = 23
     Hint = 'Rechtsklick öffnet Menü'
     Top = 8
     Width = 168
-    ItemHeight = 0
+    ItemHeight = 15
     ParentShowHint = False
     PopupMenu = pmTapAdapter
     ShowHint = True
@@ -515,11 +514,11 @@ object Form1: TForm1
     AnchorSideRight.Control = cbTapAdapter
     AnchorSideBottom.Control = cbTapAdapter
     AnchorSideBottom.Side = asrBottom
-    Left = 313
-    Height = 17
+    Left = 333
+    Height = 15
     Hint = 'Rechtsklick öffnet Menü'
-    Top = 17
-    Width = 85
+    Top = 12
+    Width = 65
     Anchors = [akTop, akRight]
     BorderSpacing.Right = 10
     Caption = 'TAP Adapter'
@@ -531,11 +530,11 @@ object Form1: TForm1
     AnchorSideTop.Control = edIpAddress
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = edIpAddress
-    Left = 599
-    Height = 17
+    Left = 616
+    Height = 15
     Hint = 'Rechtsklick öffnet Menü'
-    Top = 17
-    Width = 71
+    Top = 12
+    Width = 54
     Anchors = [akTop, akRight]
     BorderSpacing.Right = 10
     Caption = 'IP Adresse'
@@ -545,7 +544,7 @@ object Form1: TForm1
   end
   object edIpAddress: TEdit
     Left = 680
-    Height = 34
+    Height = 23
     Hint = 'Rechtsklick öffnet Menü'
     Top = 8
     Width = 152
@@ -578,20 +577,20 @@ object Form1: TForm1
     AnchorSideTop.Control = cbTincKey
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = cbTincKey
-    Left = 337
-    Height = 17
-    Top = 57
-    Width = 61
+    Left = 350
+    Height = 15
+    Top = 52
+    Width = 48
     Anchors = [akTop, akRight]
     BorderSpacing.Right = 10
     Caption = 'Schlüssel'
   end
   object cbTincKey: TComboBox
     Left = 408
-    Height = 34
+    Height = 23
     Top = 48
     Width = 168
-    ItemHeight = 0
+    ItemHeight = 15
     TabOrder = 5
     Text = 'Schlüssel wählen'
     OnChange = cbTincKeyChange
@@ -611,8 +610,8 @@ object Form1: TForm1
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 1
-    ClientHeight = 110
-    ClientWidth = 215
+    ClientHeight = 108
+    ClientWidth = 213
     Enabled = False
     Items.Strings = (
       'TAP Adapter installiert'
@@ -629,10 +628,10 @@ object Form1: TForm1
     AnchorSideTop.Control = edTincPort
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = edTincPort
-    Left = 610
-    Height = 17
-    Top = 57
-    Width = 60
+    Left = 623
+    Height = 15
+    Top = 52
+    Width = 47
     Anchors = [akTop, akRight]
     BorderSpacing.Right = 10
     Caption = 'Tinc Port'
@@ -641,7 +640,7 @@ object Form1: TForm1
   end
   object edTincPort: TEdit
     Left = 680
-    Height = 34
+    Height = 23
     Top = 48
     Width = 64
     ParentShowHint = False
@@ -655,9 +654,9 @@ object Form1: TForm1
     AnchorSideTop.Control = edTincPort
     AnchorSideTop.Side = asrCenter
     Left = 754
-    Height = 23
-    Top = 54
-    Width = 62
+    Height = 19
+    Top = 50
+    Width = 47
     BorderSpacing.Left = 10
     Caption = 'UPnP'
     TabOrder = 8
@@ -692,10 +691,10 @@ object Form1: TForm1
     AnchorSideTop.Control = btStartTinc
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = btStartTinc
-    Left = 528
-    Height = 23
-    Top = 105
-    Width = 92
+    Left = 553
+    Height = 19
+    Top = 107
+    Width = 67
     Anchors = [akTop, akRight]
     BorderSpacing.Right = 10
     Caption = 'Autostart'
@@ -704,9 +703,9 @@ object Form1: TForm1
   end
   object lvNodes: TListView
     Left = 936
-    Height = 464
+    Height = 432
     Top = 8
-    Width = 288
+    Width = 296
     Columns = <    
       item
         Caption = 'Node'
@@ -735,6 +734,14 @@ object Form1: TForm1
     ScrollBars = ssAutoBoth
     TabOrder = 12
     ViewStyle = vsReport
+  end
+  object ProgressBar1: TProgressBar
+    Left = 936
+    Height = 24
+    Top = 448
+    Width = 296
+    Max = 99
+    TabOrder = 13
   end
   object pmTapAdapter: TPopupMenu
     Left = 760

@@ -62,6 +62,7 @@ type
     pmIpAddress: TPopupMenu;
     meTapAdapterSep: TMenuItem;
     meIpAddressSep: TMenuItem;
+    ProgressBar1: TProgressBar;
     TTinc: TTimer;
     procedure btCheckClick(Sender: TObject);
     procedure btSaveClick(Sender: TObject);
@@ -412,6 +413,7 @@ begin
         TincCmd := IntToStr(Ord(CONTROL)) + ' ' + IntToStr(Ord(REQ_DUMP_NODES)) + #10;
         if CTinc.Connected then TTinc.Enabled := True;
       end else if (StrToInt(par[Ord(DN_C1)]) = Ord(CONTROL)) and (StrToInt(par[Ord(DN_C2)]) = Ord(REQ_DUMP_NODES)) then begin
+        ProgressBar1.Position := (ProgressBar1.Position + 1) Mod 100;
         if Length(par) = Ord(DN_CNT) then begin //entry
           item_found := False;
           rtt := par[Ord(DN_RTT)];
