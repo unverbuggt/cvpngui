@@ -20,7 +20,7 @@ unit cvpnlin;
 interface
 
 uses
-  StrUtils,
+  StrUtils, FileUtil,
   BaseUnix, Sockets, SysUtils,
   cvpnmod;
 
@@ -43,9 +43,31 @@ type
   function getifaddrs(var ifap: pifaddrs): Integer; cdecl; external 'libc.so' name 'getifaddrs'; {do not localize}
   procedure freeifaddrs(ifap: pifaddrs); cdecl; external 'libc.so' name 'freeifaddrs'; {do not localize}
 
+  function CommandExists(const CmdName: string): Boolean;
+  function GetTermCmd(): TStringArray;
   function CheckTAP(GeneralConfig: GeneralConfigurationType; TapConfig: TapConfigurationType): CheckTapResult;
 
 implementation
+
+function CommandExists(const CmdName: string): Boolean;
+begin
+  Result := FindDefaultExecutablePath(CmdName) <> '';
+end;
+
+function GetTermCmd(): TStringArray;
+begin
+  SetLength(Result, 2);
+  Result[0] := 'x-terminal-emulator';
+  Result[1] := '-e';
+  if not CommandExists(Result[0]) then begin
+    Result[0] := 'ptyxis';
+    Result[1] := '--';
+    if not CommandExists(Result[0]) then begin
+      Result[0] := 'konsole';
+      Result[1] := '-e';
+    end;
+  end;
+end;
 
 function CheckTAP(GeneralConfig: GeneralConfigurationType;
                  TapConfig: TapConfigurationType): CheckTapResult;

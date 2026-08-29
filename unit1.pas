@@ -531,8 +531,11 @@ end;
 
 procedure TForm1.meAddTapClick(Sender: TObject);
 var
+  {$IFDEF Unix}
   s: String;
   cmd: String;
+  termcmd : TStringArray;
+  {$ENDIF Unix}
 begin
   {$IFDEF Windows}
   RunAsAdmin(Form1.Handle, 'tap-win64\addtap.bat', '');
@@ -541,8 +544,9 @@ begin
   {$IFDEF Unix}
   cmd := 'sudo ip tuntap add dev ' + TapConfig.FriendlyName + ' mode tap user $USER;';
   cmd := cmd + 'sudo ip addr add ' + TapConfig.IpAddress + ' dev ' + TapConfig.FriendlyName + '; ';
-  cmd := cmd + 'sudo ip link set ' + TapConfig.FriendlyName + ' up; ';
-  RunCommand('x-terminal-emulator', ['-e', 'bash', '-c', cmd], s);
+  cmd := cmd + 'sudo ip link set ' + TapConfig.FriendlyName + ' up;';
+  termcmd := GetTermCmd();
+  RunCommand(termcmd[0], [termcmd[1], 'bash', '-c', cmd], s);
   {$ENDIF Unix}
   CheckConfiguration();
 end;
@@ -588,6 +592,7 @@ var
   {$IFDEF Unix}
   s: String;
   cmd: String;
+  termcmd : TStringArray;
   {$ENDIF Unix}
 begin
   {$IFDEF Windows}
@@ -601,8 +606,9 @@ begin
   {$ENDIF Windows}
   {$IFDEF Unix}
   cmd := 'sudo ip addr add ' + TapConfig.IpAddress + ' dev ' + TapConfig.FriendlyName + '; ';
-  cmd := cmd + 'sudo ip link set ' + TapConfig.FriendlyName + ' up; ';
-  RunCommand('x-terminal-emulator', ['-e', 'bash', '-c', cmd], s);
+  cmd := cmd + 'sudo ip link set ' + TapConfig.FriendlyName + ' up;';
+  termcmd := GetTermCmd();
+  RunCommand(termcmd[0], [termcmd[1], 'bash', '-c', cmd], s);
   {$ENDIF Unix}
   CheckConfiguration();
 end;

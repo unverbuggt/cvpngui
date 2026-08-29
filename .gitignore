@@ -3,6 +3,7 @@ tap-win64/*
 lib/*
 coronavpn/*
 backup/*
+AppDir/*
 cvpngui.exe
 cvpngui.dbg
 cvpngui.ini
